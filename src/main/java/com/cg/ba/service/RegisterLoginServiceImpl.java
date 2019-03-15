@@ -12,12 +12,12 @@ public class RegisterLoginServiceImpl implements RegisterLoginService {
 	RegisterLoginDAO dao=new RegisterLoginDAOImpl();
 	
 
-	public int register() {
-		return dao.register();
+	public int register(Account account) {
+		return dao.register(account);
 		// TODO Auto-generated method stub
 			}
 
-	public double login(long accNo,String password) {
+	public Account login(long accNo,String password) {
 		// TODO Auto-generated method stub
 		return dao.login(accNo, password);
 	}

@@ -15,7 +15,7 @@ public class RegisterLoginDAOImpl implements RegisterLoginDAO {
 	MyBankApplication myBank=new MyBankApplication();
 	//Scanner sc=new Scanner(System.in);
 
-	public int register() {
+	public int register(Account account) {
 		// TODO Auto-generated method stub
 		int count=0,accNo=0;
 		try {
@@ -34,7 +34,8 @@ public class RegisterLoginDAOImpl implements RegisterLoginDAO {
 			int i=preparedStatement.executeUpdate();
 			if(i==1)
 			{
-			PreparedStatement preparedStatement1= con.prepareStatement("select*from customer_details where aadhar_no=?");
+				System.out.println("done");
+			PreparedStatement preparedStatement1= con.prepareStatement("select * from customer_details where aadhar_no=?");
 			preparedStatement1.setLong(1, account.getAadhar());
 			ResultSet resultSet=preparedStatement1.executeQuery();
 			while(resultSet.next())
@@ -56,7 +57,7 @@ public class RegisterLoginDAOImpl implements RegisterLoginDAO {
 			return accNo;
 }
 
-	public double login(long accNo,String password) {
+	public Account login(long accNo,String password) {
 		// TODO Auto-generated method stub
 		double bal=0;
 		int count=0;
@@ -95,9 +96,9 @@ public class RegisterLoginDAOImpl implements RegisterLoginDAO {
 			e.printStackTrace();
 		}
 		if (count==1) {
-			return bal;
+			return account;
 		} else {
-			return 0;
+			return null;
 		}
 	}
 

@@ -13,15 +13,15 @@ public class TransactionDAOImpl implements TransactionDAO {
 static double bal=0;
 static int count;
 Account account=new Account();
-	public double withdraw(double withdrawAmount,long accNo) {
+	public double withdraw(double withdrawAmount,long accNo,Account account1) {
 		// TODO Auto-generated method stub
 		count=0;
 		
 			try {
 				Class.forName("oracle.jdbc.driver.OracleDriver");
 				Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","new","oracle123");
-				PreparedStatement preparedStatement=con.prepareStatement("Update customer_details set balance=? where accNo=?");
-				preparedStatement.setDouble(1, (account.getBalance()-withdrawAmount));
+				PreparedStatement preparedStatement=con.prepareStatement("Update customer_details set balance=? where account_no=?");
+				preparedStatement.setDouble(1, (account1.getBalance()-withdrawAmount));
 				preparedStatement.setLong(2, accNo);
 				int i=preparedStatement.executeUpdate();
 				if (i==1) {
@@ -38,23 +38,23 @@ Account account=new Account();
 				e.printStackTrace();
 			}
 			if (count==1) {
-				return account.getBalance()-withdrawAmount;
+				return account1.getBalance()-withdrawAmount;
 			} else {
-				return account.getBalance();
+				return account1.getBalance();
 			}
 			
 		
 	}
 
-	public double deposit(double depositAmount,long accNo) {
+	public double deposit(double depositAmount,long accNo,Account account1) {
 		// TODO Auto-generated method stub
 		
 		count=0;
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","new","oracle123");
-			PreparedStatement preparedStatement=con.prepareStatement("Update customer_details set balance=? where accNo=?");
-			preparedStatement.setDouble(1, (account.getBalance()+depositAmount));
+			PreparedStatement preparedStatement=con.prepareStatement("Update customer_details set balance=? where account_no=?");
+			preparedStatement.setDouble(1, (account1.getBalance()+depositAmount));
 			preparedStatement.setLong(2, accNo);
 			int i=preparedStatement.executeUpdate();
 			if (i==1) {
@@ -71,15 +71,16 @@ Account account=new Account();
 			e.printStackTrace();
 		}
 		if (count==1) {
-			return account.getBalance()+depositAmount;
+			return account1.getBalance()+depositAmount;
 		} else {
-			return account.getBalance();
+			return account1.getBalance();
 		}
 		
 	}
 
 	public double showBalance(long accNo) {
 		// TODO Auto-generated method stub
+		//long accNo1=accNo;
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
 			Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","new","oracle123");
@@ -106,43 +107,52 @@ Account account=new Account();
 
 	public double fundTransfer(long accNo,long toAccNo,double amountTransfer) {
 		// TODO Auto-generated method stub
+		double bal=0,toBal=0;
+		int cnt=0;
 		try {
 			Class.forName("oracle.jdbc.driver.OracleDriver");
-			Connection con=DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe","new","oracle123");
-			PreparedStatement preparedStatement=con.prepareStatement("insert into transaction_details values(transaction_id_seq.nextval,?,?,?)");
-			preparedStatement.setLong(1,accNo);
-			preparedStatement.setLong(2, toAccNo);
-			preparedStatement.setDouble(3, amountTransfer);
-			int i=preparedStatement.executeUpdate();
-			if(i==1)
-			{
-				System.out.println("amount transfered");
+			Connection con = DriverManager.getConnection("jdbc:oracle:thin:@localhost:1521:xe", "new", "oracle123");
+			PreparedStatement ps = con.prepareStatement("select * from customer_details where account_no=? ");
+			ps.setLong(1, accNo);
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				accNo = rs.getLong(1);
+				bal = rs.getDouble(10);
 			}
-			else
-			{
-				System.out.println("failed");
+			PreparedStatement ps1 = con.prepareStatement("select * from customer_details where account_no=? ");
+			ps1.setLong(1, toAccNo);
+			ResultSet rs1 = ps1.executeQuery();
+			while (rs1.next()) {
+				toAccNo = rs1.getLong(1);
+				toBal = rs1.getDouble(10);
 			}
-			PreparedStatement ps=con.prepareStatement("Update customer_details set balance=? where account_no=?");
-			ResultSet resultSet=ps.executeQuery();
-			/*while(resultSet.next())
-			{
-				bal=resultSet.getDouble(10);
-				
-			}*/
-			bal=(resultSet.getDouble(10)-amountTransfer);
-			ps.setDouble(1,bal);
-			ps.setLong(2,accNo);
-			ps.executeUpdate();
-			PreparedStatement ps1=con.prepareStatement("Update customer_details set balance=? where account_no=?");
-			ResultSet resultSet1=ps1.executeQuery();
-			/*while(resultSet.next())
-			{
-				bal=resultSet.getDouble(10);
-				
-			}*/
-			ps1.setDouble(1,(resultSet.getDouble(10)+amountTransfer));
-			ps1.setLong(2,toAccNo);
-			ps1.executeUpdate();
+			if (amountTransfer < bal) {
+				bal = bal - amountTransfer;
+				toBal = toBal + amountTransfer;
+				PreparedStatement ps2 = con
+						.prepareStatement("insert into transaction_details values(transaction_id_seq.nextval,?,?,?)");
+				ps2.setLong(1, accNo);
+				ps2.setLong(2, toAccNo);
+				ps2.setDouble(3, amountTransfer);
+				int i = ps2.executeUpdate();
+				if (i == 1) {
+					PreparedStatement ps3 = con
+							.prepareStatement("update customer_details set balance= ? where account_no=?");
+					ps3.setDouble(1, bal);
+					ps3.setLong(2, accNo);
+					ps3.executeUpdate();
+
+					PreparedStatement ps4 = con
+							.prepareStatement("update customer_details set balance= ? where account_no=?");
+					ps4.setDouble(1, toBal);
+					ps4.setLong(2, toAccNo);
+					ps4.executeUpdate();
+
+					// System.out.println("done");
+				}
+				cnt++;
+			}
+	
 		} catch (ClassNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -150,7 +160,11 @@ Account account=new Account();
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return bal;
+		if (cnt!=0) {
+			return bal;
+		} else {
+			return 0;
+		}
 	}
 
 }

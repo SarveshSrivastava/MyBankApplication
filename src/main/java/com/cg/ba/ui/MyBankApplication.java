@@ -11,15 +11,11 @@ import com.cg.ba.service.TransactionServiceImpl;
 public class MyBankApplication {
 	static Scanner sc=new Scanner(System.in);
 
-/*	public static void loginDetails() {
-		System.out.println("enter your account no");
-		String accNo=sc.next();
-		System.out.println("enter your password");
-		String password =sc.next();
-	}*/
 	static Account account=new Account();
+	//static Account account1=null;
 	static RegisterLoginService service=new RegisterLoginServiceImpl();
 	static TransactionService transaction=new TransactionServiceImpl();
+	static TransactionServiceImpl serviceImpl=new TransactionServiceImpl();
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
@@ -48,7 +44,8 @@ public class MyBankApplication {
 			System.out.println("enter your mobile no");
 			account.setMobileNo(sc.nextLong());
 			account.setBalance(0);
-			int accNo=service.register();
+			serviceImpl.validateMobile(account);
+			int accNo=service.register(account);
 			System.out.println("Successfully registered\nYour Account No: "+accNo);
 			break;
 		}
@@ -58,7 +55,8 @@ public class MyBankApplication {
 			long ano=sc.nextLong();
 			System.out.println("enter your password");
 			String password=sc.next();
-			double balance=service.login(ano, password);
+			Account account1=service.login(ano, password);
+			
 			System.out.println("enter your choice\n1.Withdraw\n2.Deposit\n3.Show Balance\n4.Fund Transfer");
 			int c=sc.nextInt();
 			switch(c)
@@ -67,7 +65,7 @@ public class MyBankApplication {
 			{
 				System.out.println("enter the amount you want to withdraw");
 				double withdrawAmount=sc.nextDouble();
-				bal=transaction.withdraw(withdrawAmount,ano);
+				bal=transaction.withdraw(withdrawAmount,ano,account1);
 				System.out.println("your balance "+bal);
 				break;
 			}
@@ -75,7 +73,7 @@ public class MyBankApplication {
 			{
 				System.out.println("enter the amount you want to deposit");
 				double depositAmount=sc.nextDouble();
-				bal=transaction.deposit(depositAmount,ano);
+				bal=transaction.deposit(depositAmount,ano,account1);
 				System.out.println("amount deposited\n your balance is "+bal);
 				break;
 			}
@@ -95,11 +93,18 @@ public class MyBankApplication {
 				System.out.println("your balance is "+bal);
 				break;
 			}
+			case 5:
+			{
+				System.exit(0);
+				break;
+			}
 			default:
 			{
 				System.out.println("invalid input");
 			}
 			}
+			break;
+			
 		}
 		case 3:
 		{
@@ -111,7 +116,7 @@ public class MyBankApplication {
 			System.out.println("invalid input");
 		}
 		}
-
+	
 	}
 
 }
