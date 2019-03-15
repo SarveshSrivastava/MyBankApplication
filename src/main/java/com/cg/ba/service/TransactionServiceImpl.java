@@ -21,9 +21,9 @@ public class TransactionServiceImpl implements TransactionService {
 		return dao.showBalance(accNo);
 	}
 
-	public double fundTransfer() {
+	public double fundTransfer(long accNo,long toAccNo,double amountTransfer) {
 		// TODO Auto-generated method stub
-		return dao.fundTransfer();
+		return dao.fundTransfer(accNo,toAccNo,amountTransfer);
 	}
 
 }

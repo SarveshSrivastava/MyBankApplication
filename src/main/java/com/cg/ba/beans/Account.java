@@ -9,6 +9,7 @@ public class Account {
 	private long aadhar;
 	private String address;
 	private long mobileNo;
+	private double balance;
 	public String getfName() {
 		return fName;
 	}
@@ -17,6 +18,12 @@ public class Account {
 	}
 	public String getlName() {
 		return lName;
+	}
+	public double getBalance() {
+		return balance;
+	}
+	public void setBalance(double balance) {
+		this.balance = balance;
 	}
 	public void setlName(String lName) {
 		this.lName = lName;

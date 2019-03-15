@@ -25,7 +25,7 @@ public class MyBankApplication {
 		// TODO Auto-generated method stub
 		double bal=0;
 		
-		System.out.println("enter your choice");
+		System.out.println("enter your choice\n1.Register\n2.Login\n3.Exit");
 		int ch=sc.nextInt();
 		switch(ch)
 		{
@@ -47,8 +47,10 @@ public class MyBankApplication {
 			account.setAddress(sc.next());
 			System.out.println("enter your mobile no");
 			account.setMobileNo(sc.nextLong());
+			account.setBalance(0);
 			int accNo=service.register();
 			System.out.println("Successfully registered\nYour Account No: "+accNo);
+			break;
 		}
 		case 2:
 		{
@@ -57,7 +59,7 @@ public class MyBankApplication {
 			System.out.println("enter your password");
 			String password=sc.next();
 			double balance=service.login(ano, password);
-			System.out.println("enter your choice");
+			System.out.println("enter your choice\n1.Withdraw\n2.Deposit\n3.Show Balance\n4.Fund Transfer");
 			int c=sc.nextInt();
 			switch(c)
 			{
@@ -67,29 +69,46 @@ public class MyBankApplication {
 				double withdrawAmount=sc.nextDouble();
 				bal=transaction.withdraw(withdrawAmount,ano);
 				System.out.println("your balance "+bal);
+				break;
 			}
 			case 2:
 			{
 				System.out.println("enter the amount you want to deposit");
 				double depositAmount=sc.nextDouble();
 				bal=transaction.deposit(depositAmount,ano);
-				System.out.println("amount deposited"+bal);
+				System.out.println("amount deposited\n your balance is "+bal);
+				break;
 			}
 			case 3:
 			{
 				bal=transaction.showBalance(ano);
-				System.out.println("your balance"+bal);
+				System.out.println("your balance is "+bal);
+				break;
 			}
 			case 4:
 			{
 				System.out.println("enter the account no of receiver");
-				transaction.fundTransfer();
+				long toAcno=sc.nextLong();
+				System.out.println("enter amount you want to transfer");
+				double amountTransfer=sc.nextDouble();
+				bal=transaction.fundTransfer(ano,toAcno,amountTransfer);
+				System.out.println("your balance is "+bal);
+				break;
+			}
+			default:
+			{
+				System.out.println("invalid input");
 			}
 			}
 		}
 		case 3:
 		{
 			System.exit(0);
+			break;
+		}
+		default:
+		{
+			System.out.println("invalid input");
 		}
 		}
 
